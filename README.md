@@ -1,4 +1,5 @@
 # mxonline_restful
+python版本3.6.13
 将https://github.com/crawlerwolf/mxonline 修改为前后端分离
 
 # 集成django_recaptcha图片以base64编码后传输
