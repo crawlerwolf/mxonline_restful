@@ -1,0 +1,9 @@
+Django==3.2.12
+django_filter==21.1
+django_recaptcha==3.0.0
+djangorestframework==3.13.1
+drf_extensions==0.7.1
+PyJWT==2.3.0
+PyMySQL==1.0.2
+six==1.16.0
+South==1.0.2
