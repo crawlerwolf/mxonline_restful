@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80013
 File Encoding         : 65001
 
-Date: 2022-03-04 12:10:03
+Date: 2022-03-08 11:34:23
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -79,7 +79,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of auth_permission
@@ -180,6 +180,26 @@ INSERT INTO `auth_permission` VALUES ('93', 'Can add token', '24', 'add_tokenpro
 INSERT INTO `auth_permission` VALUES ('94', 'Can change token', '24', 'change_tokenproxy');
 INSERT INTO `auth_permission` VALUES ('95', 'Can delete token', '24', 'delete_tokenproxy');
 INSERT INTO `auth_permission` VALUES ('96', 'Can view token', '24', 'view_tokenproxy');
+INSERT INTO `auth_permission` VALUES ('97', 'Can add association', '25', 'add_association');
+INSERT INTO `auth_permission` VALUES ('98', 'Can change association', '25', 'change_association');
+INSERT INTO `auth_permission` VALUES ('99', 'Can delete association', '25', 'delete_association');
+INSERT INTO `auth_permission` VALUES ('100', 'Can view association', '25', 'view_association');
+INSERT INTO `auth_permission` VALUES ('101', 'Can add code', '26', 'add_code');
+INSERT INTO `auth_permission` VALUES ('102', 'Can change code', '26', 'change_code');
+INSERT INTO `auth_permission` VALUES ('103', 'Can delete code', '26', 'delete_code');
+INSERT INTO `auth_permission` VALUES ('104', 'Can view code', '26', 'view_code');
+INSERT INTO `auth_permission` VALUES ('105', 'Can add nonce', '27', 'add_nonce');
+INSERT INTO `auth_permission` VALUES ('106', 'Can change nonce', '27', 'change_nonce');
+INSERT INTO `auth_permission` VALUES ('107', 'Can delete nonce', '27', 'delete_nonce');
+INSERT INTO `auth_permission` VALUES ('108', 'Can view nonce', '27', 'view_nonce');
+INSERT INTO `auth_permission` VALUES ('109', 'Can add user social auth', '28', 'add_usersocialauth');
+INSERT INTO `auth_permission` VALUES ('110', 'Can change user social auth', '28', 'change_usersocialauth');
+INSERT INTO `auth_permission` VALUES ('111', 'Can delete user social auth', '28', 'delete_usersocialauth');
+INSERT INTO `auth_permission` VALUES ('112', 'Can view user social auth', '28', 'view_usersocialauth');
+INSERT INTO `auth_permission` VALUES ('113', 'Can add partial', '29', 'add_partial');
+INSERT INTO `auth_permission` VALUES ('114', 'Can change partial', '29', 'change_partial');
+INSERT INTO `auth_permission` VALUES ('115', 'Can delete partial', '29', 'delete_partial');
+INSERT INTO `auth_permission` VALUES ('116', 'Can view partial', '29', 'view_partial');
 
 -- ----------------------------
 -- Table structure for captcha_captchastore
@@ -193,7 +213,7 @@ CREATE TABLE `captcha_captchastore` (
   `expiration` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `hashkey` (`hashkey`)
-) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of captcha_captchastore
@@ -291,6 +311,8 @@ INSERT INTO `captcha_captchastore` VALUES ('90', 'QGTS', 'qgts', 'b7c5c88f291bc7
 INSERT INTO `captcha_captchastore` VALUES ('91', 'FMLM', 'fmlm', '2013dbd4fe05649499c5168bec1425e4782f9226', '2022-03-03 15:11:24.489070');
 INSERT INTO `captcha_captchastore` VALUES ('92', 'PFIP', 'pfip', '36b67591bb2a9d40f423dfa64e8c2d60c4ca57c5', '2022-03-03 15:11:44.385164');
 INSERT INTO `captcha_captchastore` VALUES ('93', 'DOHT', 'doht', 'c030b11a6ceac93ab511f9b3c64f65b2e842512a', '2022-03-03 15:11:52.075130');
+INSERT INTO `captcha_captchastore` VALUES ('94', 'LPTB', 'lptb', 'a959766db56753361ac33588ee62f95eb004b399', '2022-03-07 16:09:32.810613');
+INSERT INTO `captcha_captchastore` VALUES ('95', 'NZAR', 'nzar', 'bf4548bcc29c5a333d6c3ea22b5be1b180f8e364', '2022-03-07 16:10:39.041705');
 
 -- ----------------------------
 -- Table structure for courses_course
@@ -448,7 +470,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of django_content_type
@@ -474,6 +496,11 @@ INSERT INTO `django_content_type` VALUES ('16', 'organization', 'citydict');
 INSERT INTO `django_content_type` VALUES ('17', 'organization', 'courseorg');
 INSERT INTO `django_content_type` VALUES ('18', 'organization', 'teacher');
 INSERT INTO `django_content_type` VALUES ('5', 'sessions', 'session');
+INSERT INTO `django_content_type` VALUES ('25', 'social_django', 'association');
+INSERT INTO `django_content_type` VALUES ('26', 'social_django', 'code');
+INSERT INTO `django_content_type` VALUES ('27', 'social_django', 'nonce');
+INSERT INTO `django_content_type` VALUES ('29', 'social_django', 'partial');
+INSERT INTO `django_content_type` VALUES ('28', 'social_django', 'usersocialauth');
 INSERT INTO `django_content_type` VALUES ('19', 'users', 'banner');
 INSERT INTO `django_content_type` VALUES ('20', 'users', 'emailverifyrecord');
 INSERT INTO `django_content_type` VALUES ('21', 'users', 'userprofile');
@@ -488,7 +515,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of django_migrations
@@ -521,6 +548,25 @@ INSERT INTO `django_migrations` VALUES ('25', 'captcha', '0001_initial', '2022-0
 INSERT INTO `django_migrations` VALUES ('26', 'authtoken', '0001_initial', '2022-03-03 12:40:24.392107');
 INSERT INTO `django_migrations` VALUES ('27', 'authtoken', '0002_auto_20160226_1747', '2022-03-03 12:40:24.512156');
 INSERT INTO `django_migrations` VALUES ('28', 'authtoken', '0003_tokenproxy', '2022-03-03 12:40:24.570716');
+INSERT INTO `django_migrations` VALUES ('29', 'default', '0001_initial', '2022-03-07 15:29:43.447577');
+INSERT INTO `django_migrations` VALUES ('30', 'social_auth', '0001_initial', '2022-03-07 15:29:43.492475');
+INSERT INTO `django_migrations` VALUES ('31', 'default', '0002_add_related_name', '2022-03-07 15:29:43.616427');
+INSERT INTO `django_migrations` VALUES ('32', 'social_auth', '0002_add_related_name', '2022-03-07 15:29:43.725771');
+INSERT INTO `django_migrations` VALUES ('33', 'default', '0003_alter_email_max_length', '2022-03-07 15:29:45.459170');
+INSERT INTO `django_migrations` VALUES ('34', 'social_auth', '0003_alter_email_max_length', '2022-03-07 15:29:45.525534');
+INSERT INTO `django_migrations` VALUES ('35', 'default', '0004_auto_20160423_0400', '2022-03-07 15:29:45.637743');
+INSERT INTO `django_migrations` VALUES ('36', 'social_auth', '0004_auto_20160423_0400', '2022-03-07 15:29:45.691424');
+INSERT INTO `django_migrations` VALUES ('37', 'social_auth', '0005_auto_20160727_2333', '2022-03-07 15:29:46.403910');
+INSERT INTO `django_migrations` VALUES ('38', 'social_django', '0006_partial', '2022-03-07 15:29:47.617091');
+INSERT INTO `django_migrations` VALUES ('39', 'social_django', '0007_code_timestamp', '2022-03-07 15:29:48.600932');
+INSERT INTO `django_migrations` VALUES ('40', 'social_django', '0008_partial_timestamp', '2022-03-07 15:29:49.453941');
+INSERT INTO `django_migrations` VALUES ('41', 'social_django', '0009_auto_20191118_0520', '2022-03-07 15:29:51.045812');
+INSERT INTO `django_migrations` VALUES ('42', 'social_django', '0010_uid_db_index', '2022-03-07 15:29:52.064766');
+INSERT INTO `django_migrations` VALUES ('43', 'social_django', '0004_auto_20160423_0400', '2022-03-07 15:29:52.177984');
+INSERT INTO `django_migrations` VALUES ('44', 'social_django', '0003_alter_email_max_length', '2022-03-07 15:29:52.290261');
+INSERT INTO `django_migrations` VALUES ('45', 'social_django', '0001_initial', '2022-03-07 15:29:52.433733');
+INSERT INTO `django_migrations` VALUES ('46', 'social_django', '0005_auto_20160727_2333', '2022-03-07 15:29:52.640612');
+INSERT INTO `django_migrations` VALUES ('47', 'social_django', '0002_add_related_name', '2022-03-07 15:29:52.724576');
 
 -- ----------------------------
 -- Table structure for django_session
@@ -537,13 +583,19 @@ CREATE TABLE `django_session` (
 -- ----------------------------
 -- Records of django_session
 -- ----------------------------
+INSERT INTO `django_session` VALUES ('0atf4v3e9i7up2amy1f8zg7e1ce1q0tw', '.eJxVjMsOwiAQRf-FtSEwZabg0r3fQHhK1UBS2pXx35WkC92ec-59Mev2rdi9p9UukZ2ZZKdf5l14pDpEvLt6azy0uq2L5yPhh-382mJ6Xo7276C4Xr5rUggkZi00BuEnQwLQgcJILs054uBKmExICsAkAKmzTJ5wIjFJxd4fnTQ18Q:1nR9G7:oSua3NMiVwLHGuHcp_rcWUEpoPan3oiDW5OOx7ISc18', '2022-03-21 17:02:27.006060');
+INSERT INTO `django_session` VALUES ('13j2h3o1j504y7mqdo0x1z4p3mbe7djk', 'e30:1nR7Qw:a9gxoRLp5e2TB0_OkWxPQZwOkAfvY6jpm756moMLIuM', '2022-03-21 15:05:30.174515');
+INSERT INTO `django_session` VALUES ('2j6i0ayjxb4bsrt4io4fo0r6fyhg648o', 'e30:1nR7QW:WLxeZVku2oNN0Naa66jUEjT1j717fLwT0TIsHKxG3jU', '2022-03-21 15:05:04.985157');
 INSERT INTO `django_session` VALUES ('7ym39236nv64qa3a2ct2avhnczfdglak', '.eJxVjMsOwiAQRf-FtSEwZabg0r3fQHhK1UBS2pXx35WkC92ec-59Mev2rdi9p9UukZ2ZZKdf5l14pDpEvLt6azy0uq2L5yPhh-382mJ6Xo7276C4Xr5rUggkZi00BuEnQwLQgcJILs054uBKmExICsAkAKmzTJ5wIjFJxd4fnTQ18Q:1nPaNI:1Es8-5REE-25ZwRNAotyTvZvRx4wd9lIXK_xPDAQg2k', '2022-03-17 09:35:24.547390');
 INSERT INTO `django_session` VALUES ('9dnn6wh75akqx6x5xxngeyliv1n6y4rp', '.eJxVjMsOwiAQRf-FtSEwZabg0r3fQHhK1UBS2pXx35WkC92ec-59Mev2rdi9p9UukZ2ZZKdf5l14pDpEvLt6azy0uq2L5yPhh-382mJ6Xo7276C4Xr5rUggkZi00BuEnQwLQgcJILs054uBKmExICsAkAKmzTJ5wIjFJxd4fnTQ18Q:1nPM0q:xTiWiD90o410HWL1zT4WUdRWkSQLRnJHNhYR9XnweeQ', '2022-03-16 18:15:16.364671');
 INSERT INTO `django_session` VALUES ('9lws60sy1nj5qk33amc9vbhgi906u4rt', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nMNsf:khz-c6PBzUna2IAZ4LK9dD4SK436zm0XQJJ7GcHvv9Y', '2022-03-08 13:38:33.564180');
 INSERT INTO `django_session` VALUES ('a9ifgdyvgx941xchh07o43pkflu4y84o', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nNVoU:jpyeTn1P1yiFBi20fR4jwBukhdCNbTIT0Sjo4hE9JOU', '2022-03-11 16:18:54.602963');
+INSERT INTO `django_session` VALUES ('adfw7jr1zv9wlqdvo6l0qyg879k3qsr7', 'e30:1nR7Oi:Nn59D_wwAWGxbcYEvzsZuHpiKpdO4DmMguUpzyRWaR8', '2022-03-21 15:03:12.378850');
 INSERT INTO `django_session` VALUES ('b0vhm3q000jgmkn5ncb5khtbgzpkrtkf', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nM38j:SiTkmvUQQTZVfnyicz0A83ZXq1tESNEplkic88RvpFs', '2022-03-07 15:29:45.949231');
 INSERT INTO `django_session` VALUES ('b3vtfw441qmwbetugkp4050oqkzp3ny1', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nOZln:fZiX9L15Yigp-cQBlOHsz72P_iwXX6feX4Iwty1I79M', '2022-03-14 14:44:31.207213');
+INSERT INTO `django_session` VALUES ('g0vtof2vusbznvdea1ngbpmo5akojtp7', '.eJyrViosjC8uSSxJVbJScktLD8tzL8_wdrEwLPdzKwkpCilIdy3JrMwzMS8IcXVR0lEqT82syMyD64j0Sgp3cfJPczcoCclPyi3JDYjITg1xKve1NPL0dio2gehIyodryLRw9sv0KyuqNA6LCA61zDHPCU31jDI2KczP80zMNM1XqgUATc0xXA:1nR8VY:-hZe5fdqqNwoxBvHbQjholACREUldmKYkpLgmk6CXPw', '2022-03-21 16:14:20.056679');
 INSERT INTO `django_session` VALUES ('heyr4eqhu4mc7f7zlcykcflp06m03pdg', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nOaQK:G8zYbjcWUW0zvCNTNFgKVBwfx3g2OBmfxss4xheCWtY', '2022-03-14 15:26:24.481610');
+INSERT INTO `django_session` VALUES ('l60gmsojwd8hp3tiap6mx4dtoga162lm', 'e30:1nR7Oi:Nn59D_wwAWGxbcYEvzsZuHpiKpdO4DmMguUpzyRWaR8', '2022-03-21 15:03:12.365185');
 INSERT INTO `django_session` VALUES ('qbury8m8edd4jd1zb0ejsnk0vdbax0wg', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nN6lP:3f5AiqakMmD1GD9MWKjJHxWGKgP0BW_yvPGwkFwtxQI', '2022-03-10 13:34:03.015755');
 INSERT INTO `django_session` VALUES ('rkyqs08em76onrr9ti0zujyz063htr2s', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nMlNr:Fm9XZHaRyQ_7g0bubeDW-MtHSBdK4PtSxo4MTs0hwkU', '2022-03-09 14:44:19.968190');
 INSERT INTO `django_session` VALUES ('tu41mi64kugp88p1c8gzp628suoinr4v', '.eJxVjDsOwjAQBe_iGlm2119Kes5gbdYbHECOFCcV4u4QKQW0b2beS2Tc1pq3zkueijgLLU6_24D04LaDcsd2myXNbV2mQe6KPGiX17nw83K4fwcVe_3WYJwHdhqK8oygiwEKcdRM0QYAazzZQKNOCZ1K1hmIgWwCiMqBj0W8P7IqNi8:1nOYUa:YK2ZSEAf3MkbP4zRax0xma7wbQUx8d7cHNIC_ny1OCk', '2022-03-14 13:22:40.813074');
@@ -745,6 +797,106 @@ INSERT INTO `organization_teacher` VALUES ('9', 'teacher3', '3', '3', '3', '3', 
 INSERT INTO `organization_teacher` VALUES ('10', 'teacher4', '4', '4', '4', '4', '4', '', '0', '0', '2022-02-23 15:21:00.000000', '1');
 
 -- ----------------------------
+-- Table structure for social_auth_association
+-- ----------------------------
+DROP TABLE IF EXISTS `social_auth_association`;
+CREATE TABLE `social_auth_association` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `server_url` varchar(255) NOT NULL,
+  `handle` varchar(255) NOT NULL,
+  `secret` varchar(255) NOT NULL,
+  `issued` int(11) NOT NULL,
+  `lifetime` int(11) NOT NULL,
+  `assoc_type` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `social_auth_association_server_url_handle_078befa2_uniq` (`server_url`,`handle`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of social_auth_association
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for social_auth_code
+-- ----------------------------
+DROP TABLE IF EXISTS `social_auth_code`;
+CREATE TABLE `social_auth_code` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(254) NOT NULL,
+  `code` varchar(32) NOT NULL,
+  `verified` tinyint(1) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `social_auth_code_email_code_801b2d02_uniq` (`email`,`code`),
+  KEY `social_auth_code_code_a2393167` (`code`),
+  KEY `social_auth_code_timestamp_176b341f` (`timestamp`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of social_auth_code
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for social_auth_nonce
+-- ----------------------------
+DROP TABLE IF EXISTS `social_auth_nonce`;
+CREATE TABLE `social_auth_nonce` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `server_url` varchar(255) NOT NULL,
+  `timestamp` int(11) NOT NULL,
+  `salt` varchar(65) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `social_auth_nonce_server_url_timestamp_salt_f6284463_uniq` (`server_url`,`timestamp`,`salt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of social_auth_nonce
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for social_auth_partial
+-- ----------------------------
+DROP TABLE IF EXISTS `social_auth_partial`;
+CREATE TABLE `social_auth_partial` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `token` varchar(32) NOT NULL,
+  `next_step` smallint(5) unsigned NOT NULL,
+  `backend` varchar(32) NOT NULL,
+  `data` longtext NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `social_auth_partial_token_3017fea3` (`token`),
+  KEY `social_auth_partial_timestamp_50f2119f` (`timestamp`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of social_auth_partial
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for social_auth_usersocialauth
+-- ----------------------------
+DROP TABLE IF EXISTS `social_auth_usersocialauth`;
+CREATE TABLE `social_auth_usersocialauth` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `provider` varchar(32) NOT NULL,
+  `uid` varchar(255) NOT NULL,
+  `extra_data` longtext NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `social_auth_usersocialauth_provider_uid_e6b5e668_uniq` (`provider`,`uid`),
+  KEY `social_auth_usersoci_user_id_17d28448_fk_users_use` (`user_id`),
+  KEY `social_auth_usersocialauth_uid_796e51dc` (`uid`),
+  CONSTRAINT `social_auth_usersoci_user_id_17d28448_fk_users_use` FOREIGN KEY (`user_id`) REFERENCES `users_userprofile` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of social_auth_usersocialauth
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for users_banner
 -- ----------------------------
 DROP TABLE IF EXISTS `users_banner`;
@@ -808,7 +960,7 @@ CREATE TABLE `users_userprofile` (
 -- ----------------------------
 -- Records of users_userprofile
 -- ----------------------------
-INSERT INTO `users_userprofile` VALUES ('1', 'pbkdf2_sha256$260000$k8wsOyAJYp9QYgXbMO9HI2$FO0JJkKsF0dDhOZuy2ZnIs4DA7H8tj1a0w3DWqNlEMU=', '2022-03-04 10:36:31.851594', '1', 'admin', '', '', 'admin@qq.com', '1', '1', '2022-02-21 15:28:54.488265', '', '', 'female', '', '', 'image/default.png');
+INSERT INTO `users_userprofile` VALUES ('1', 'pbkdf2_sha256$260000$k8wsOyAJYp9QYgXbMO9HI2$FO0JJkKsF0dDhOZuy2ZnIs4DA7H8tj1a0w3DWqNlEMU=', '2022-03-07 17:02:26.946506', '1', 'admin', '', '', 'admin@qq.com', '1', '1', '2022-02-21 15:28:54.488265', '', '', 'female', '', '', 'image/default.png');
 INSERT INTO `users_userprofile` VALUES ('2', 'pbkdf2_sha256$260000$O8hLGgSWUz6ENdFJQcm4B2$B4fHsDMECjaP/YeLOQnC3PvEYT/VysnY+RwbNF6avhs=', null, '0', 'demo', '', '', '154080796@qq.com', '0', '1', '2022-03-02 17:08:40.866147', 'demo', '', 'female', '北京海淀', '', 'image/default.png');
 INSERT INTO `users_userprofile` VALUES ('3', 'pbkdf2_sha256$260000$uZpfsrNMAohw1gZAkA5tot$g3iBsee18uZRz//8uocApRw9nJ/clOwj/87CinKGCmU=', null, '0', 'demo1', '', '', '154056724@qq.com', '0', '1', '2022-03-02 17:11:58.592211', 'demo', '', 'female', '', '', 'image/default.png');
 INSERT INTO `users_userprofile` VALUES ('4', 'pbkdf2_sha256$260000$E9TEbzAEJILtQZU1EsItHU$DGbb1NMBnGJMe3un0KwBDdfn4fH2Kv3aKPT8/tUcnPA=', null, '0', 'demo2', '', '', '154236724@qq.com', '0', '0', '2022-03-02 17:49:08.078703', 'demo', '', 'female', '', '', 'image/default.png');

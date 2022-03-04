@@ -7,3 +7,4 @@ PyJWT==2.3.0
 PyMySQL==1.0.2
 six==1.16.0
 South==1.0.2
+social-auth-app-djangon==5.0.0

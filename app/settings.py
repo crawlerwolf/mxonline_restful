@@ -22,7 +22,7 @@ TEACHER_RANK_NUM = 3
 TEACHER_FAV_NUM = 3
 
 # 是否使用rest_framework_jwt
-IS_TOKEN = False
+IS_TOKEN = True
 # 设置token名称
 AUTH_COOKIE = "token"
 # 使用RESR_JWT设置True,使用rest默认的设置为False

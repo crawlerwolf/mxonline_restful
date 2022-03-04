@@ -33,6 +33,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.weibo.WeiboOAuth2',
+    'social_core.backends.qq.QQOAuth2',
+    'social_core.backends.weixin.WeixinOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 # Application definition
 
@@ -46,9 +52,9 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
-    'crispy_forms',
     'captcha',
     'rest_framework.authtoken',
+    'social_django',
 
     'app.courses',
     'app.operation',
@@ -83,6 +89,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -198,3 +206,14 @@ CACHES = {
         }
     }
 }
+
+
+# 第三方登录
+SOCIAL_AUTH_WEIBO_KEY = ""
+SOCIAL_AUTH_WEIBO_SECRET = ""
+
+SOCIAL_AUTH_QQ_KEY = ""
+SOCIAL_AUTH_QQ_SECRET = ""
+
+SOCIAL_AUTH_WEIXIN_KEY = ""
+SOCIAL_AUTH_WEIXIN_SECRET = ""

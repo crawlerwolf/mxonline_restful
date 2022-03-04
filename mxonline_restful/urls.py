@@ -18,11 +18,16 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include, re_path
+from django.conf.urls import url
 from rest_framework.documentation import include_docs_urls
 from django.views.static import serve  # 处理静态文件
+from rest_framework.routers import DefaultRouter
 
 from mxonline_restful import settings
+from users.views import UserLoginViewSet, CaptchaView, UserLogoutView
 
+router = DefaultRouter()
+router.register('login', UserLoginViewSet, 'login')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,6 +37,12 @@ urlpatterns = [
     path('api/', include('courses.urls')),
     path('api/', include('users.urls')),
     path('api/', include('operation.urls')),
+    url(r'^', include(router.urls)),
+    path('captcha/', CaptchaView.as_view(), name='captcha/'),
+    path('logout/', UserLogoutView.as_view(), name='logout/'),
     # 配置上传文件的处理
     re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+
+    # 第三方登录
+    # path('', include('social_django.urls', namespace='social')),
 ]

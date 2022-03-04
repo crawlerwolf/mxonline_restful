@@ -4,6 +4,7 @@ from datetime import datetime
 from django.contrib.auth.hashers import make_password
 
 # Create your views here.
+from django.contrib.auth import login, logout
 
 from rest_framework import mixins, viewsets, generics, authentication, permissions, status
 from rest_framework.response import Response
@@ -28,6 +29,27 @@ class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     serializer_class = UserLoginSerializer
 
+    def get_token(self, user):
+        if IS_TOKEN:
+            if RESR_JWT:
+                # 登录成功，签发token,通过当前登录用户获取荷载（payload）
+                payload = jwt_payload_handler(user)
+                # 通过payload生成token串（三段：头，payload，签名）
+                token = jwt_encode_handler(payload)
+            else:
+                # 登录成功，签发token,通过当前登录用户获取token
+                tokens, created = Token.objects.get_or_create(user=user)
+                token = tokens.key
+            response_data = {"msg": "登录成功", 'token': token}
+            response = Response(response_data)
+            expiration = (datetime.utcnow() +
+                          RESR_JWT_EXPIRATION_DELTA)
+            response.set_cookie(AUTH_COOKIE,
+                                token,
+                                expires=expiration,
+                                httponly=True)
+            return response
+
     def create(self, request, *args, **kwargs):
         """
         生成并返回token，并将token加到cookie中
@@ -35,24 +57,12 @@ class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        if RESR_JWT:
-            # 登录成功，签发token,通过当前登录用户获取荷载（payload）
-            payload = jwt_payload_handler(user)
-            # 通过payload生成token串（三段：头，payload，签名）
-            token = jwt_encode_handler(payload)
-        else:
-            # 登录成功，签发token,通过当前登录用户获取token
-            tokens, created = Token.objects.get_or_create(user=user)
-            token = tokens.key
-        response_data = {'token': token}
-        response = Response(response_data)
-        expiration = (datetime.utcnow() +
-                      RESR_JWT_EXPIRATION_DELTA)
-        response.set_cookie(AUTH_COOKIE,
-                            token,
-                            expires=expiration,
-                            httponly=True)
-        return response
+        token = self.get_token(user)
+        if token:
+            return token
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        data = {"msg": "登录成功"}
+        return Response(data, headers=data)
 
 
 class UserLogoutView(APIView):
@@ -68,8 +78,7 @@ class UserLogoutView(APIView):
         else:
             authentication_classes.insert(0, UserAuthentication)
 
-    def get(self, request):
-        user = request.user
+    def remove_token(self, user):
         if IS_TOKEN:
             if RESR_JWT:
                 pass
@@ -83,7 +92,14 @@ class UserLogoutView(APIView):
                                 expires=datetime.utcnow(),
                                 httponly=True)
             return response
-        data = {}
+
+    def get(self, request):
+        user = request.user
+        remove_token = self.remove_token(user)
+        if remove_token:
+            return remove_token
+        logout(request)
+        data = {"msg": "用户已退出"}
         return Response(data, headers=data)
 
 
@@ -194,4 +210,4 @@ class CaptchaView(APIView):
         image = captcha_image(request, hash_key)
         image_base = base64.b64encode(image.content)
         json_data = {"id": hash_key, "image_base": image_base.decode('utf8')}
-        return Response(json_data, headers=json_data)
+        return Response(json_data)

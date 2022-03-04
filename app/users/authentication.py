@@ -44,7 +44,7 @@ class UserJWTAuthentication(authentication.BaseAuthentication):
         try:
             payload = jwt_decode_handler(token)
             user = UserProfile.objects.get(id=payload['user_id'])
-        except jwt.ExpiredSignature:
+        except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('签名过期')
         except jwt.DecodeError:
             raise exceptions.AuthenticationFailed('签名验证失败')
