@@ -4,7 +4,7 @@ from datetime import datetime
 from django.contrib.auth.hashers import make_password
 
 # Create your views here.
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 
 from rest_framework import mixins, viewsets, generics, authentication, permissions, status
 from rest_framework.response import Response
@@ -60,7 +60,12 @@ class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         token = self.get_token(user)
         if token:
             return token
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        auth_user =authenticate(request, username=request.data['username'], password=request.data['password'])
+        if auth_user:
+            user = auth_user
+            login(request, user)
+        else:
+            login(request, user, backend='users.backends.UserModelBackend')
         data = {"msg": "登录成功"}
         return Response(data, headers=data)
 

@@ -2,13 +2,14 @@
 import re
 from datetime import datetime
 
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from rest_framework import serializers
 from captcha.views import CaptchaStore
 from rest_framework.validators import UniqueValidator
 
 from .models import UserProfile
+from .backends import UserModelBackend
 
 
 def mobile_reg(value):
@@ -43,7 +44,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
     def validate_username(self, username):
         """查看用户是否存在"""
-        user = UserProfile.objects.filter(Q(username=username) | Q(email=username) | Q(mobile=username))
+        user = UserModelBackend().authenticate(username)
         if user:
             return username
         else:
@@ -51,15 +52,11 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
     def validate_password(self, password):
         """查看密码是否正确"""
-        user = UserProfile.objects.filter(
-            Q(username=self.initial_data['username']) | Q(email=self.initial_data['username'])
-            | Q(mobile=self.initial_data['username']))
+        user = UserModelBackend().authenticate(self.initial_data['username'], password)
         if user:
-            encoded = user.first().password
-            if check_password(password, encoded):
                 return password
+        else:
             raise serializers.ValidationError("密码错误")
-        return password
 
     def validate(self, attrs):
         user = UserProfile.objects.filter(Q(username=attrs["username"])
