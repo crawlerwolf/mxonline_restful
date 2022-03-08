@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import authentication
 from rest_framework import exceptions
 from rest_framework_jwt.settings import api_settings
+from settings import AUTH_COOKIE
 
 from .models import UserProfile
 
@@ -17,7 +18,7 @@ class UserAuthentication(authentication.BaseAuthentication):
         if not cookies:
             raise exceptions.AuthenticationFailed('用户未认证')
 
-        token = cookies.get("token", None)
+        token = cookies.get(AUTH_COOKIE, None)
         if not token:
             raise exceptions.AuthenticationFailed('用户未认证')
 
@@ -37,7 +38,7 @@ class UserJWTAuthentication(authentication.BaseAuthentication):
         if not cookies:
             raise exceptions.AuthenticationFailed('用户未认证')
 
-        token = cookies.get("token", None)
+        token = cookies.get(AUTH_COOKIE, None)
         if not token:
             raise exceptions.AuthenticationFailed('用户未认证')
 
