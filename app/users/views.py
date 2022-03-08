@@ -4,7 +4,7 @@ from datetime import datetime
 from django.contrib.auth.hashers import make_password
 
 # Create your views here.
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 
 from rest_framework import mixins, viewsets, generics, authentication, permissions, status
 from rest_framework.response import Response
@@ -23,32 +23,36 @@ jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
+def get_token(user, response=None):
+    if IS_TOKEN:
+        if RESR_JWT:
+            # 登录成功，签发token,通过当前登录用户获取荷载（payload）
+            payload = jwt_payload_handler(user)
+            # 通过payload生成token串（三段：头，payload，签名）
+            token = jwt_encode_handler(payload)
+        else:
+            # 登录成功，签发token,通过当前登录用户获取token
+            tokens, created = Token.objects.get_or_create(user=user)
+            token = tokens.key
+        response_data = {"msg": "登录成功", 'token': token}
+        if response:
+            response = response
+        else:
+            response = Response(response_data)
+        expiration = (datetime.utcnow() +
+                      RESR_JWT_EXPIRATION_DELTA)
+        response.set_cookie(AUTH_COOKIE,
+                            token,
+                            expires=expiration,
+                            httponly=True)
+        return response
+
+
 class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     用户获取token
     """
     serializer_class = UserLoginSerializer
-
-    def get_token(self, user):
-        if IS_TOKEN:
-            if RESR_JWT:
-                # 登录成功，签发token,通过当前登录用户获取荷载（payload）
-                payload = jwt_payload_handler(user)
-                # 通过payload生成token串（三段：头，payload，签名）
-                token = jwt_encode_handler(payload)
-            else:
-                # 登录成功，签发token,通过当前登录用户获取token
-                tokens, created = Token.objects.get_or_create(user=user)
-                token = tokens.key
-            response_data = {"msg": "登录成功", 'token': token}
-            response = Response(response_data)
-            expiration = (datetime.utcnow() +
-                          RESR_JWT_EXPIRATION_DELTA)
-            response.set_cookie(AUTH_COOKIE,
-                                token,
-                                expires=expiration,
-                                httponly=True)
-            return response
 
     def create(self, request, *args, **kwargs):
         """
@@ -57,15 +61,10 @@ class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        token = self.get_token(user)
+        token = get_token(user)
         if token:
             return token
-        auth_user =authenticate(request, username=request.data['username'], password=request.data['password'])
-        if auth_user:
-            user = auth_user
-            login(request, user)
-        else:
-            login(request, user, backend='users.backends.UserModelBackend')
+        login(request, user, backend='users.backends.UserModelBackend')
         data = {"msg": "登录成功"}
         return Response(data, headers=data)
 

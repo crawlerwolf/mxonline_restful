@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     'app.users',
 
     'extra_apps.DjangoUeditor',
-    'extra_apps.rest_framework_jwt'
+    'extra_apps.rest_framework_jwt',
+    'extra_apps.social_core',
 ]
 
 MIDDLEWARE = [
