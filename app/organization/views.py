@@ -114,7 +114,7 @@ class OrgCourseViewSet(CacheResponseMixin, mixins.RetrieveModelMixin, viewsets.G
         return self.get_paginated_response(serializer.data)
 
 
-class CityDictViewSet(CacheResponseMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class CityDictViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     城市信息
     list:
@@ -200,7 +200,7 @@ class TeacherCourseViewSet(CacheResponseMixin, mixins.RetrieveModelMixin, viewse
         return self.get_paginated_response(serializer.data)
 
 
-class TeacherRankViewSet(CacheResponseMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class TeacherRankViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     教师排行信息
     list:
@@ -221,7 +221,7 @@ class TeacherRankViewSet(CacheResponseMixin, mixins.ListModelMixin, viewsets.Gen
         return Response(serializer.data)
 
 
-class TeacherFavViewSet(CacheResponseMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+class TeacherFavViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     学生最喜欢的教师排行信息
     list:
