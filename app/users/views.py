@@ -165,6 +165,36 @@ class UserProfileViewSet(mixins.UpdateModelMixin, mixins.CreateModelMixin,
                 user.save()
                 return Response({"msg": "密码已修改"}, status=status.HTTP_202_ACCEPTED)
 
+    def is_auth(self, request, instance):
+        """
+        是否有修改权限
+        :param request:
+        :param instance:
+        :return:
+        """
+        if request.user == instance:
+            return
+        if request.user.is_superuser:
+            return
+        return Response({"msg": "无权限"}, status=status.HTTP_403_FORBIDDEN)
+
+    def re_login(self, request, instance, serializer):
+        """
+        更新密码后重新登录
+        :param request: 请求--获取用户实例
+        :param instance: 获取的实例--用户
+        :param serializer: 验证后的serializer--获取验证后的数据
+        :return:
+        """
+        msg = self.updata_pwd(instance, serializer.validated_data)
+        if request.user == instance or not request.user.is_superuser:
+            if IS_TOKEN:
+                msg = remove_token(request.user, data={"msg": "密码已修改"})
+            else:
+                from django.contrib.auth.models import AnonymousUser
+                request.user = AnonymousUser()
+        return msg
+
     def get_serializer_class(self):
         if self.action == "create":
             return UserRegSerializer
@@ -195,18 +225,13 @@ class UserProfileViewSet(mixins.UpdateModelMixin, mixins.CreateModelMixin,
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        if not request.user.is_superuser:
-            return Response({"msg": "无权限"}, status=status.HTTP_403_FORBIDDEN)
+        auth = self.is_auth(request, instance)
+        if isinstance(auth, Response):
+            return auth
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        msg = self.updata_pwd(instance, serializer.validated_data)
+        msg = self.re_login(request, instance, serializer)
         if msg:
-            if not request.user.is_superuser or request.user == instance:
-                if IS_TOKEN:
-                    msg = remove_token(request.user, data={"msg": "密码已修改"})
-                else:
-                    from django.contrib.auth.models import AnonymousUser
-                    request.user = AnonymousUser()
             return msg
         self.perform_update(serializer)
 
