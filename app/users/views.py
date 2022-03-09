@@ -24,6 +24,12 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
 def get_token(user, response=None):
+    """
+    添加token
+    :param user: 用户query
+    :param response: 返回的response
+    :return:
+    """
     if IS_TOKEN:
         if RESR_JWT:
             # 登录成功，签发token,通过当前登录用户获取荷载（payload）
@@ -48,6 +54,29 @@ def get_token(user, response=None):
         return response
 
 
+def remove_token(user, data=None):
+    """
+    删除token
+    :param user: 用户query
+    :param data: 要返回的信息dict
+    :return:
+    """
+    if IS_TOKEN:
+        if RESR_JWT:
+            pass
+        else:
+            token = Token.objects.get(user=user)
+            token.delete()
+        if not data:
+            data = {"msg": "用户已退出"}
+        response = Response(data)
+        response.set_cookie(AUTH_COOKIE,
+                            "",
+                            expires=datetime.utcnow(),
+                            httponly=True)
+        return response
+
+
 class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     用户获取token
@@ -61,12 +90,14 @@ class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        if not user.is_active:
+            return Response({"msg": "用户未激活"})
         token = get_token(user)
         if token:
             return token
         login(request, user, backend='users.backends.UserModelBackend')
         data = {"msg": "登录成功"}
-        return Response(data, headers=data)
+        return Response(data)
 
 
 class UserLogoutView(APIView):
@@ -82,29 +113,14 @@ class UserLogoutView(APIView):
         else:
             authentication_classes.insert(0, UserAuthentication)
 
-    def remove_token(self, user):
-        if IS_TOKEN:
-            if RESR_JWT:
-                pass
-            else:
-                token = Token.objects.get(user=user)
-                token.delete()
-            data = {"msg": "用户已退出"}
-            response = Response(data)
-            response.set_cookie(AUTH_COOKIE,
-                                "",
-                                expires=datetime.utcnow(),
-                                httponly=True)
-            return response
-
     def get(self, request):
         user = request.user
-        remove_token = self.remove_token(user)
-        if remove_token:
-            return remove_token
+        remove = remove_token(user)
+        if remove:
+            return remove
         logout(request)
         data = {"msg": "用户已退出"}
-        return Response(data, headers=data)
+        return Response(data)
 
 
 class UserProfileViewSet(mixins.UpdateModelMixin, mixins.CreateModelMixin,
@@ -163,10 +179,10 @@ class UserProfileViewSet(mixins.UpdateModelMixin, mixins.CreateModelMixin,
         serializer.validated_data["is_active"] = False
         serializer.save()
 
-    def get_object(self):
-        obj = self.request.user
-        self.check_object_permissions(self.request, obj)
-        return obj
+    # def get_object(self):
+    #     obj = self.request.user
+    #     self.check_object_permissions(self.request, obj)
+    #     return obj
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -179,12 +195,18 @@ class UserProfileViewSet(mixins.UpdateModelMixin, mixins.CreateModelMixin,
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        if not instance.is_superuser:
+        if not request.user.is_superuser:
             return Response({"msg": "无权限"}, status=status.HTTP_403_FORBIDDEN)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        msg = self.updata_pwd(request.user, serializer.validated_data)
+        msg = self.updata_pwd(instance, serializer.validated_data)
         if msg:
+            if not request.user.is_superuser or request.user == instance:
+                if IS_TOKEN:
+                    msg = remove_token(request.user, data={"msg": "密码已修改"})
+                else:
+                    from django.contrib.auth.models import AnonymousUser
+                    request.user = AnonymousUser()
             return msg
         self.perform_update(serializer)
 

@@ -20,5 +20,5 @@ class UserModelBackend(ModelBackend):
         except UserProfile.DoesNotExist:
             return None
         else:
-            if check_password(password, user.password) and self.user_can_authenticate(user):
+            if check_password(password, user.password):
                 return user
