@@ -8,3 +8,4 @@ PyMySQL==1.0.2
 six==1.16.0
 South==1.0.2
 social-auth-app-djangon==5.0.0
+django-simpleui==2022.3.1
