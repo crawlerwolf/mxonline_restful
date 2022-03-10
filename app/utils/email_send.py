@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-# author = minjie
 from random import Random
 from django.core.mail import send_mail
 
+from mxonline_restful.settings import EMAIL_FROM
 from users.models import EmailVerifyRecord
-
-EMAIL_FROM = ""
 
 
 def random_str(random_length=8):
@@ -18,7 +16,7 @@ def random_str(random_length=8):
     return make_str
 
 
-def send_register_email(email, send_type='register'):
+def send_email(email, send_type='register', email_title='', email_body=''):
     email_record = EmailVerifyRecord()
     if send_type == 'updata_email':
         code = random_str(6)
@@ -29,27 +27,40 @@ def send_register_email(email, send_type='register'):
     email_record.send_type = send_type
     email_record.save()
 
-    email_title = ''
-    email_body = ''
-
     if send_type == 'register':
-        email_title = u'慕学在线网注册激活链接'
-        email_body = u'请点击下面的链接激活你的账号: http://127.0.0.1:8000/user_active/{}'.format(code)
+        if email_title and email_body:
+            # 自定义注册邮箱发送信息
+            email_title = email_title
+            email_body = email_body + code
+        else:
+            email_title = u'注册激活'
+            email_body = u'账号激活码code: {}'.format(code)
 
         send_status = send_mail(email_title, email_body, EMAIL_FROM, [email])
         if send_status:
             pass
 
     elif send_type == 'forget':
-        email_title = u'慕学在线网账户密码重置链接'
-        email_body = u'请点击下面的链接重置账号密码: http://127.0.0.1:8000/reset/{}'.format(code)
+        if email_title and email_body:
+            # 自定义忘记密码发送信息
+            email_title = email_title
+            email_body = email_body + code
+        else:
+            email_title = u'账户密码重置'
+            email_body = u'重置密码code: {}'.format(code)
 
         send_status = send_mail(email_title, email_body, EMAIL_FROM, [email])
         if send_status:
             pass
+
     elif send_type == 'updata_email':
-        email_title = u'慕学在线网邮箱修改验证码'
-        email_body = u'邮箱验证码: {}'.format(code)
+        if email_title and email_body:
+            # 自定义更换邮箱发送信息
+            email_title = email_title
+            email_body = email_body + code
+        else:
+            email_title = u'修改邮箱'
+            email_body = u'修改邮箱code: {}'.format(code)
 
         send_status = send_mail(email_title, email_body, EMAIL_FROM, [email])
         if send_status:

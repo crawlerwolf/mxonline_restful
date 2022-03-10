@@ -29,11 +29,12 @@ AUTH_USER_MODEL = "users.UserProfile"
 SECRET_KEY = 'django-insecure-y6+x@s=f1%@c0x7j87-9bkdaa6i=li1#q9)*!6k#$fz)2o=y36'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
 AUTHENTICATION_BACKENDS = (
+    'users.backends.UserModelBackend',
     'social_core.backends.weibo.WeiboOAuth2',
     'social_core.backends.qq.QQOAuth2',
     'social_core.backends.weixin.WeixinOAuth2',
@@ -241,3 +242,13 @@ SIMPLEUI_HOME_QUICK = True
 SIMPLEUI_HOME_INFO = False
 # 自定义SIMPLEUI的Logo
 SIMPLEUI_LOGO = " "
+
+# 邮箱设置
+EMAIL_HOST = 'smtp.sina.com'
+EMAIL_PORT = 25
+# 新浪邮箱用户名
+EMAIL_HOST_USER = ''
+# 新浪邮箱密码
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+EMAIL_FROM = EMAIL_HOST_USER

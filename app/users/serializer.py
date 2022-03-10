@@ -8,7 +8,7 @@ from rest_framework import serializers
 from captcha.views import CaptchaStore
 from rest_framework.validators import UniqueValidator
 
-from .models import UserProfile
+from .models import UserProfile, EmailVerifyRecord
 from .backends import UserModelBackend
 
 
@@ -67,11 +67,6 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['username', 'password']
-
-
-class UserLogOutSerializer(serializers.Serializer):
-    """用户登出"""
-    msg = serializers.CharField()
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -172,7 +167,7 @@ class UserInfoUpdateSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False, help_text="头像", label="头像")
     address = serializers.CharField(required=False, help_text="地址", label="地址")
     email = serializers.EmailField(required=False, read_only=True, help_text="邮箱", label="邮箱")
-    mobile = serializers.CharField(required=False, help_text="手机号", label="手机号",
+    mobile = serializers.CharField(required=False, read_only=True, help_text="手机号", label="手机号",
                                    max_length=11, min_length=11,
                                    error_messages={
                                        'max_length': '手机号长度不是11位',
@@ -192,7 +187,7 @@ class UserInfoUpdateSerializer(serializers.ModelSerializer):
         fields = ['nick_name', 'birday', 'gender', 'address', 'mobile', 'image', 'email']
 
 
-class UserPwdSerializer(serializers.Serializer):
+class UserChangePwdSerializer(serializers.Serializer):
     """用户修改密码"""
     password1 = serializers.CharField(required=True, write_only=True, help_text="新密码", label="新密码",
                                      max_length=16, min_length=6, style={'input_type': 'password'},
@@ -211,10 +206,133 @@ class UserPwdSerializer(serializers.Serializer):
                                      })
 
 
-class UserActiveSerializer(serializers.Serializer):
+class UserForgetPwdSerializer(serializers.Serializer):
+    """用户忘记密码"""
+    email = serializers.EmailField(write_only=True, required=True, help_text="邮箱", label="邮箱",
+                                     allow_null=False, error_messages={
+                                         'invalid': '邮箱'
+                                     })
+    password1 = serializers.CharField(required=True, write_only=True, help_text="新密码", label="新密码",
+                                     max_length=16, min_length=6, style={'input_type': 'password'},
+                                     allow_null=False, error_messages={
+                                         'max_length': '密码长度不大于16位',
+                                         'min_length': '密码长度不小于6位',
+                                         'allow_null': '密码不能为空',
+                                     })
 
-    email = serializers.EmailField(help_text="邮箱", label="邮箱",
-                                     max_length=16, min_length=6,
+    password2 = serializers.CharField(required=True, write_only=True, help_text="确认密码", label="确认密码",
+                                     max_length=16, min_length=6, style={'input_type': 'password'},
+                                     allow_null=False, error_messages={
+                                         'max_length': '密码长度不大于16位',
+                                         'min_length': '密码长度不小于6位',
+                                         'allow_null': '密码不能为空',
+                                     })
+    code = serializers.CharField(write_only=True, required=True, label="邮箱验证码",
+                                      help_text="邮箱验证码", max_length=20, min_length=6,
+                                      allow_null=False, error_messages={
+                                            'invalid': '请输入验证码',
+                                            'max_length': '验证码错误',
+                                            'min_length': '验证码错误'})
+
+    def validate_code(self, code):
+        """查看验证码是否存在"""
+        code_is_exit = EmailVerifyRecord.objects.filter(Q(code=code) & Q(send_type="forget"))
+        if code_is_exit:
+            return code
+        else:
+            raise serializers.ValidationError("验证码已过期或不存在")
+
+
+class UserEmailChangeSerializer(serializers.Serializer):
+    """
+    用户修改邮箱
+    """
+    email1 = serializers.EmailField(write_only=True, required=True, help_text="原始邮箱", label="原始邮箱",
+                                     allow_null=False, error_messages={
+                                         'invalid': '原始邮箱'
+                                     })
+    email2 = serializers.EmailField(write_only=True, required=True, help_text="邮箱", label="邮箱",
+                                     allow_null=False, error_messages={
+                                         'invalid': '邮箱'
+                                     })
+    code = serializers.CharField(write_only=True, required=True, label="邮箱验证码",
+                                      help_text="邮箱验证码", max_length=20, min_length=6,
+                                      allow_null=False, error_messages={
+                                            'invalid': '请输入验证码',
+                                            'max_length': '验证码错误',
+                                            'min_length': '验证码错误'})
+
+    def validate_code(self, code):
+        """查看验证码是否存在"""
+        code_is_exit = EmailVerifyRecord.objects.filter(Q(code=code) & Q(send_type="updata_email"))
+        if code_is_exit:
+            return code
+        else:
+            raise serializers.ValidationError("验证码已过期或不存在")
+
+
+class EmailSendSerializer(serializers.ModelSerializer):
+    """
+    验证邮箱并发送邮箱验证码code
+    """
+    email = serializers.EmailField(write_only=True, required=True, help_text="邮箱", label="邮箱",
                                      allow_null=False, error_messages={
                                          'invalid': '邮箱格式错误'
                                      })
+    send_type = serializers.CharField(write_only=True, required=True, label="类型",
+                                      help_text="类型(register:注册,forget:找回密码,updata_email:修改邮箱)",
+                                      allow_null=False, error_messages={
+                                         'invalid': '类型错误'
+                                     })
+
+    def validate_send_type(self, send_type):
+        """查看类型是否正确"""
+        if send_type in ['register', 'forget', 'updata_email']:
+            return send_type
+        else:
+            raise serializers.ValidationError("类型错误")
+
+    def validate_email(self, email):
+        """查看邮箱是否有用户使用"""
+        try:
+            user = UserProfile.objects.get(email=email)
+        except UserProfile.DoesNotExist:
+            # 如果类型不是修改邮箱则报错
+            if self.initial_data["send_type"] == "updata_email":
+                return email
+            raise serializers.ValidationError("该邮箱不在平台，检查邮箱是否正确")
+        # 用户使用
+        if user:
+            # 如果类型是修改邮箱则报错
+            if self.initial_data["send_type"] == "updata_email":
+                raise serializers.ValidationError("该邮箱已被使用")
+        return email
+
+    class Meta:
+        model = EmailVerifyRecord
+        fields = ['email', 'send_type']
+
+
+class UserActiveSerializer(serializers.Serializer):
+    """
+    邮箱激活用户
+    """
+    email = serializers.EmailField(write_only=True, required=True, help_text="邮箱", label="邮箱",
+                                     allow_null=False, error_messages={
+                                         'invalid': '请输入邮箱'
+                                     })
+    code = serializers.CharField(write_only=True, required=True, label="邮箱验证码",
+                                      help_text="邮箱验证码", max_length=20, min_length=6,
+                                      allow_null=False, error_messages={
+                                            'invalid': '请输入验证码',
+                                            'max_length': '验证码错误',
+                                            'min_length': '验证码错误'})
+
+    def validate_code(self, code):
+        """查看验证码是否存在"""
+        code_is_exit = EmailVerifyRecord.objects.filter(Q(code=code) & Q(send_type="register"))
+        if code_is_exit:
+            return code
+        else:
+            raise serializers.ValidationError("验证码已过期或不存在")
+

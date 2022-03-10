@@ -30,5 +30,8 @@ python版本3.6.13
 修改后新建的mx_online.sql 用户admin 密码admin23
 修改前的 mxonline.sql 用户test 密码admin123qaz
 ```
-### 邮箱认证暂未编写
+## 邮箱认证
+```
+使用新浪邮箱进行认证
+```
 

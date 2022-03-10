@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 from django.contrib.auth import login, logout
+from django.db.models import Q
 
 from rest_framework import mixins, viewsets, generics, authentication, permissions, status
 from rest_framework.response import Response
@@ -15,9 +16,11 @@ from rest_framework_jwt.settings import api_settings
 from settings import RESR_JWT, RESR_JWT_EXPIRATION_DELTA, AUTH_COOKIE, IS_TOKEN
 
 from users.authentication import UserAuthentication, UserJWTAuthentication
-from .models import UserProfile
-from .serializer import UserInfoSerializer, UserRegSerializer, UserLoginSerializer, UserLogOutSerializer
-from .serializer import UserPwdSerializer, UserInfoUpdateSerializer
+from utils.email_send import send_email
+from .models import UserProfile, EmailVerifyRecord
+from .serializer import UserInfoSerializer, UserRegSerializer, UserLoginSerializer
+from .serializer import UserChangePwdSerializer, UserInfoUpdateSerializer, UserForgetPwdSerializer
+from .serializer import EmailSendSerializer, UserActiveSerializer, UserEmailChangeSerializer
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -77,6 +80,21 @@ def remove_token(user, data=None):
         return response
 
 
+def remove_email_code(code, send_type):
+    """
+    查询邮箱验证码记录
+    :param code: 邮箱验证码
+    :param send_type: 验证码类型
+    :return:
+    """
+    all_records = EmailVerifyRecord.objects.filter(Q(code=code) &
+                                                   Q(send_type=send_type))
+    if all_records:
+        for record in all_records:
+            # 删除记录
+            record.delete()
+
+
 class UserLoginViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     用户获取token
@@ -104,7 +122,6 @@ class UserLogoutView(APIView):
     """
     用户登出
     """
-    serializer_class = UserLogOutSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [authentication.SessionAuthentication]
     if IS_TOKEN:
@@ -199,7 +216,7 @@ class UserProfileViewSet(mixins.UpdateModelMixin, mixins.CreateModelMixin,
         if self.action == "create":
             return UserRegSerializer
         elif self.action == "partial_update":
-            return UserPwdSerializer
+            return UserChangePwdSerializer
         elif self.action == "update":
             return UserInfoUpdateSerializer
         return UserInfoSerializer
@@ -243,9 +260,81 @@ class UserProfileViewSet(mixins.UpdateModelMixin, mixins.CreateModelMixin,
         return Response(serializer.data)
 
 
-class UserEmailView(generics.GenericAPIView):
-    """暂时未开发"""
-    pass
+class UserEmailChangeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    修改邮箱
+    """
+    serializer_class = UserEmailChangeSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    if IS_TOKEN:
+        if RESR_JWT:
+            authentication_classes.insert(0, UserJWTAuthentication)
+        else:
+            authentication_classes.insert(0, UserAuthentication)
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = UserProfile.objects.get(id=request.user.id)
+        user.email = serializer.validated_data["email2"]
+        user.save()
+        remove_email_code(serializer.validated_data["code"], "updata_email")
+        return Response({'msg': '邮箱已修改'}, status=status.HTTP_200_OK)
+
+
+class UserForgetPwdViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    用户忘记密码
+    """
+    serializer_class = UserForgetPwdSerializer
+
+    def updata_pwd(self, data):
+        """
+        用户重置密码
+        """
+        pwd1 = data.get("password1")
+        pwd2 = data.get("password2")
+        if pwd1 == pwd2:
+            user = UserProfile.objects.get(email=data.get("email"))
+            user.password = make_password(pwd2)
+            user.save()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.updata_pwd(serializer.validated_data)
+        remove_email_code(serializer.validated_data["code"], "forget")
+        return Response({'msg': '密码已重置'}, status=status.HTTP_200_OK)
+
+
+class EmailSendViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    发送邮箱验证
+    """
+    serializer_class = EmailSendSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        send_email(serializer.validated_data["email"], serializer.validated_data["send_type"])
+        return Response({'msg': '邮箱验证码已发送'}, status=status.HTTP_200_OK)
+
+
+class UserActiveViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    使用邮箱激活用户
+    """
+    serializer_class = UserActiveSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = UserProfile.objects.get(email=serializer.validated_data["email"])
+        user.is_active = True
+        user.save()
+        remove_email_code(serializer.validated_data["code"], "register")
+        return Response({"msg": "用户激活成功"}, status=status.HTTP_200_OK)
 
 
 class CaptchaView(APIView):
