@@ -17,7 +17,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, BASE_DIR)
-sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+sys.path.insert(0, os.path.join(BASE_DIR, 'app'))
 sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 
 
@@ -29,7 +29,7 @@ AUTH_USER_MODEL = "users.UserProfile"
 SECRET_KEY = 'django-insecure-y6+x@s=f1%@c0x7j87-9bkdaa6i=li1#q9)*!6k#$fz)2o=y36'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -43,6 +43,7 @@ AUTHENTICATION_BACKENDS = (
 # Application definition
 
 INSTALLED_APPS = [
+    'simpleui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -223,3 +224,20 @@ SOCIAL_AUTH_WEIXIN_SECRET = ""
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = ""
 # 第三方登录后用户激活页
 SOCIAL_AUTH_INACTIVE_USER_URL = ""
+
+# 指定simpleui默认的主题,指定一个文件名，相对路径就从simpleui的theme目录读取
+SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
+# 显示最近动作
+SIMPLEUI_HOME_ACTION = True
+# 关闭使用分析
+SIMPLEUI_ANALYSIS = False
+# 脱机模式加载静态资源
+SIMPLEUI_STATIC_OFFLINE = True
+# 不显示遮罩层
+SIMPLEUI_LOADING = False
+# 显示快速操作
+SIMPLEUI_HOME_QUICK = True
+# 不显示服务器信息
+SIMPLEUI_HOME_INFO = False
+# 自定义SIMPLEUI的Logo
+SIMPLEUI_LOGO = " "
