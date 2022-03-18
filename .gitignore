@@ -1,0 +1,11 @@
+/.idea
+/static
+/templates
+/app/__pycache__
+/app/courses/__pycache__
+/app/operation/__pycache__
+/app/organization/__pycache__
+/app/users/__pycache__
+/extra_apps/rest_framework_jwt/__pycache__
+/extra_apps/DjangoUeditor/__pycache__
+/extra_apps/__pycache__
